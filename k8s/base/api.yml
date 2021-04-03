@@ -1,0 +1,44 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: task-manager
+  name: api
+spec:
+  selector:
+    matchLabels:
+      app: api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: golang
+          volumeMounts:
+            - name: app-files
+              mountPath: /app
+          image: task-manager:latest
+          imagePullPolicy: Never
+          command: ["go", "run", "main.go"]
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: app-files
+          hostPath:
+            path: /app
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: task-manager
+  name: api
+spec:
+  selector:
+    app: api
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
