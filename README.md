@@ -18,6 +18,11 @@ $ eval $(minikube -p minikube docker-env)
 $ minikube start --mount-string="/path/to/project:/app" --mount 
 ```
 
+### Setup db
+```shell
+$ kubectl exec -n task-manager mysql-0 -- mysql -uroot --execute="CREATE DATABASE task_manager;"
+```
+
 ### Apply resources
 ```shell script
 $ kubectl apply -k k8s/base

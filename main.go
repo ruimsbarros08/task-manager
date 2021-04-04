@@ -1,16 +1,12 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"github.com/ruimsbarros08/task-manager/mappings"
+	"github.com/ruimsbarros08/task-manager/models"
 )
 
 func main() {
-	r := gin.Default()
-
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"data": "hello world"})
-	})
-
-	r.Run()
+	models.ConnectDatabase()
+	mappings.CreateUrlMappings()
+	mappings.Router.Run()
 }
