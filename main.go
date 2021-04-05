@@ -8,7 +8,7 @@ import (
 
 func main() {
 	models.ConnectDatabase()
-	services.ConnectRedis()
+	services.ConnectRedis("producer")
 	services.OpenTasksQueue()
 	mappings.CreateUrlMappings()
 	mappings.Router.Run()

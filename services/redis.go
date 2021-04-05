@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"github.com/adjust/rmq/v3"
 	"github.com/ruimsbarros08/task-manager/models"
+	"log"
 	"os"
 )
 
 var Connection rmq.Connection
 var Tasks rmq.Queue
 
-func ConnectRedis() {
-	connection, err := rmq.OpenConnection("producer", "tcp", os.Getenv("REDIS_URL"), 2, nil)
+func ConnectRedis(tag string) {
+	connection, err := rmq.OpenConnection(tag, "tcp", os.Getenv("REDIS_URL"), 1, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -35,4 +36,8 @@ func NotifyManagers(task models.Task) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func HandleNotification(notification string) {
+	log.Print(notification)
 }
