@@ -5,10 +5,6 @@ import (
 	"log"
 )
 
-type Result struct {
-	count int
-}
-
 func UserHasRole(user models.User, roleName string) (bool, error) {
 	var roles []models.Role
 	models.DB.Raw("SELECT * FROM roles r JOIN user_role ur ON ur.role_id = r.id WHERE r.name = ? AND ur.user_id = ?", roleName, user.ID).Scan(&roles)
