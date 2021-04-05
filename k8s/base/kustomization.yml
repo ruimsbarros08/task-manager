@@ -5,6 +5,7 @@ namespace: task-manager
 resources:
   - namespace.yaml
   - mysql.yml
+  - redis.yml
   - api.yml
 
 generatorOptions:

@@ -33,7 +33,7 @@ func CreateTask(c *gin.Context) {
 	}
 
 	role, err := services.UserHasRole(user, "Technician")
-	if role {
+	if !role {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User is not technician"})
 		return
 	}
@@ -45,6 +45,7 @@ func CreateTask(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": task})
+	services.NotifyManagers(task)
 }
 
 func UpdateTask(c *gin.Context) {

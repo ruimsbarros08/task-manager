@@ -29,6 +29,8 @@ spec:
               value: 2@euEG4OpxdsGANm$iJzo2s9
             - name: DATABASE
               value: root:@tcp(mysql:3306)/task_manager?parseTime=true
+            - name: REDIS_URL
+              value: redis:6379
       volumes:
         - name: app-files
           hostPath:
