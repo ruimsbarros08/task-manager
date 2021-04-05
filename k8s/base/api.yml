@@ -28,7 +28,7 @@ spec:
             - name: ACCESS_SECRET
               value: 2@euEG4OpxdsGANm$iJzo2s9
             - name: DATABASE
-              value: root:@tcp(mysql:3306)/task_manager
+              value: root:@tcp(mysql:3306)/task_manager?parseTime=true
       volumes:
         - name: app-files
           hostPath:

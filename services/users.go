@@ -2,11 +2,12 @@ package services
 
 import (
 	"github.com/ruimsbarros08/task-manager/models"
+	"time"
 )
 
 func CreateUser(email string, name string, password string, roles []uint) (models.User, error) {
 	password = hashAndSalt(password)
-	user := models.User{Email: email, Name: name, Password: password}
+	user := models.User{Email: email, Name: name, Password: password, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	err := models.DB.Create(&user).Error
 
 	// TODO verify duplicated role_id's
@@ -20,6 +21,13 @@ func CreateUser(email string, name string, password string, roles []uint) (model
 func GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 	err := models.DB.Where("email = ?", email).First(&user).Error
+
+	return user, err
+}
+
+func GetUserById(id uint) (models.User, error) {
+	var user models.User
+	err := models.DB.Where("id = ?", id).First(&user).Error
 
 	return user, err
 }
