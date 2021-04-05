@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/ruimsbarros08/task-manager/models"
+	"github.com/ruimsbarros08/task-manager/repositories"
 	"time"
 )
 
@@ -41,5 +42,9 @@ func addRole(roleId uint, user* models.User) {
 	}
 
 	models.DB.Model(&user).Association("Roles").Append(&role)
+}
+
+func UserHasRole(user models.User, roleName string) (bool, error) {
+	return repositories.UserHasRole(user, roleName)
 }
 
