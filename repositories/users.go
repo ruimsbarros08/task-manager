@@ -10,9 +10,9 @@ type Result struct {
 }
 
 func UserHasRole(user models.User, roleName string) (bool, error) {
-	var result Result
-	models.DB.Raw("SELECT COUNT(1) FROM user_role ur JOIN roles r ON ur.role_id = r.id WHERE r.name = ? AND ur.user_id = ?", roleName, user.ID).Scan(&result)
+	var roles []models.Role
+	models.DB.Raw("SELECT * FROM roles r JOIN user_role ur ON ur.role_id = r.id WHERE r.name = ? AND ur.user_id = ?", roleName, user.ID).Scan(&roles)
 
-	log.Printf("Count roles for user %d, for role %s. Result %d", user.ID, roleName, result.count)
-	return result.count == 1, nil
+	log.Printf("Roles for user %d, for role %s. Result %d", user.ID, roleName, len(roles))
+	return len(roles) > 0, nil
 }
