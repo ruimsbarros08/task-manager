@@ -7,6 +7,11 @@ import (
 	"net/http"
 )
 
+type UsersController struct {
+	UserService services.UserService
+	AuthService services.AuthenticationService
+}
+
 type CreateUserInput struct {
 	Email    string `json:"email" binding:"required"`
 	Name     string `json:"name" binding:"required"`
@@ -19,14 +24,14 @@ type LoginUserInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-func CreateUser(c *gin.Context) {
+func (ctr *UsersController) CreateUser(c *gin.Context) {
 	var input CreateUserInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := services.CreateUser(input.Email, input.Name, input.Password, input.Roles)
+	user, err := ctr.UserService.CreateUser(input.Email, input.Name, input.Password, input.Roles)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -36,14 +41,14 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func Login(c *gin.Context) {
+func (ctr *UsersController)Login(c *gin.Context) {
 	var input LoginUserInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := services.LoginUser(input.Email, input.Password)
+	token, err := ctr.AuthService.LoginUser(input.Email, input.Password)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

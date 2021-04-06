@@ -11,7 +11,11 @@ import (
 	"log"
 )
 
-func hashAndSalt(pwd string) string {
+type EncryptionService struct {
+
+}
+
+func (s *EncryptionService)hashAndSalt(pwd string) string {
 	saltedBytes := []byte(pwd)
 	hash, err := bcrypt.GenerateFromPassword(saltedBytes, bcrypt.DefaultCost)
 	if err != nil {
@@ -21,13 +25,13 @@ func hashAndSalt(pwd string) string {
 	return string(hash)
 }
 
-func compare(hash string, pwd string) error {
+func (s *EncryptionService)compare(hash string, pwd string) error {
 	incoming := []byte(pwd)
 	existing := []byte(hash)
 	return bcrypt.CompareHashAndPassword(existing, incoming)
 }
 
-func Encrypt(stringToEncrypt string, keyString string) (encryptedString string) {
+func (s *EncryptionService)Encrypt(stringToEncrypt string, keyString string) (encryptedString string) {
 
 	key, _ := hex.DecodeString(keyString)
 	plaintext := []byte(stringToEncrypt)
@@ -51,7 +55,7 @@ func Encrypt(stringToEncrypt string, keyString string) (encryptedString string) 
 	return fmt.Sprintf("%x", ciphertext)
 }
 
-func decrypt(encryptedString string, keyString string) (decryptedString string) {
+func (s *EncryptionService)decrypt(encryptedString string, keyString string) (decryptedString string) {
 
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(encryptedString)

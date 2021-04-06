@@ -9,23 +9,28 @@ import (
 	"time"
 )
 
-func LoginUser(email string, password string) (string, error) {
-	user, err := GetUserByEmail(email)
-
-	if err != nil {
-		return "", err
-	}
-
-	err = compare(user.Password, password)
-
-	if err != nil {
-		return "", err
-	}
-
-	return createToken(user.ID)
+type AuthenticationService struct {
+	UserService UserService
+	EncryptionService EncryptionService
 }
 
-func ExtractTokenFromHeader(bearToken string) string {
+func (s *AuthenticationService) LoginUser(email string, password string) (string, error) {
+	user, err := s.UserService.GetUserByEmail(email)
+
+	if err != nil {
+		return "", err
+	}
+
+	err = s.EncryptionService.compare(user.Password, password)
+
+	if err != nil {
+		return "", err
+	}
+
+	return s.createToken(user.ID)
+}
+
+func (s *AuthenticationService) ExtractTokenFromHeader(bearToken string) string {
 	strArr := strings.Split(bearToken, " ")
 	if len(strArr) == 2 {
 		return strArr[1]
@@ -33,8 +38,8 @@ func ExtractTokenFromHeader(bearToken string) string {
 	return ""
 }
 
-func ExtractTokenMetadata(t string) (uint64, error) {
-	token, err := verifyToken(t)
+func (s *AuthenticationService) ExtractTokenMetadata(t string) (uint64, error) {
+	token, err := s.verifyToken(t)
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +50,7 @@ func ExtractTokenMetadata(t string) (uint64, error) {
 	return strconv.ParseUint(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
 }
 
-func verifyToken(t string) (*jwt.Token, error) {
+func (s *AuthenticationService)verifyToken(t string) (*jwt.Token, error) {
 	token, err := jwt.Parse(t, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -58,7 +63,7 @@ func verifyToken(t string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func createToken(userId uint) (string, error) {
+func (s *AuthenticationService)createToken(userId uint) (string, error) {
 	var err error
 
 	atClaims := jwt.MapClaims{}

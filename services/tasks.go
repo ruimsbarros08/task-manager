@@ -1,30 +1,35 @@
 package services
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/ruimsbarros08/task-manager/models"
 	"time"
 )
 
-func CreateTask(summary string, user models.User) (models.Task, error) {
+type TaskService struct {
+	Db *gorm.DB
+}
+
+func (s *TaskService) CreateTask(summary string, user models.User) (models.Task, error) {
 	//secret := os.Getenv("ACCESS_SECRET")
 	//encryptedSummary := Encrypt(summary, secret)
-	//TODO
+	//TODO encrypt
 	task := models.Task{Summary: summary, PerformedAt: time.Now(), UserID: user.ID, UpdatedAt: time.Now()}
-	err := models.DB.Create(&task).Error
+	err := s.Db.Create(&task).Error
 
 	return task, err
 }
 
-func GetAllTasks()([]models.Task, error) {
+func (s *TaskService) GetAllTasks() ([]models.Task, error) {
 	var tasks []models.Task
-	err := models.DB.Model("Task").Find(&tasks).Error
+	err := s.Db.Model("Task").Find(&tasks).Error
 
 	return tasks, err
 }
 
-func GetTechnicianTasks(technicianId uint) ([]models.Task, error) {
+func (s *TaskService) GetTechnicianTasks(technicianId uint) ([]models.Task, error) {
 	var tasks []models.Task
-	err := models.DB.Model("Task").Where("user_id = ?", technicianId).Find(&tasks).Error
+	err := s.Db.Model("Task").Where("user_id = ?", technicianId).Find(&tasks).Error
 
 	return tasks, err
 }

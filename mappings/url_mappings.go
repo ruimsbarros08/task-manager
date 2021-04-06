@@ -5,20 +5,25 @@ import (
 	"github.com/ruimsbarros08/task-manager/controllers"
 )
 
-var Router *gin.Engine
+type Mappings struct {
+	UserController controllers.UsersController
+	TaskController controllers.TasksController
+}
 
-func CreateUrlMappings() {
-	Router = gin.Default()
+func (m *Mappings)CreateUrlMappings() *gin.Engine {
+	router := gin.Default()
 
-	users := Router.Group("/users")
+	users := router.Group("/users")
 	{
-		users.POST("/login", controllers.Login)
-		users.POST("/register", controllers.CreateUser)
+		users.POST("/login", m.UserController.Login)
+		users.POST("/register", m.UserController.CreateUser)
 	}
 
-	tasks := Router.Group("/tasks")
+	tasks := router.Group("/tasks")
 	{
-		tasks.POST("/", controllers.CreateTask)
-		tasks.GET("/", controllers.ListTasks)
+		tasks.POST("/", m.TaskController.CreateTask)
+		tasks.GET("/", m.TaskController.ListTasks)
 	}
+
+	return router
 }

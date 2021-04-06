@@ -32,3 +32,8 @@ $ kubectl apply -k k8s/base
 ```shell script
 $ kubectl port-forward service/api 8080:8080 -n task-manager
 ```
+
+### Test
+```shell
+$  docker run --rm --env CGO_ENABLED=0 task-manager:latest go test ./... 
+```
