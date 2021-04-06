@@ -45,3 +45,53 @@ $ kubectl port-forward service/api 8080:8080 -n task-manager
 ```shell
 $  docker run --rm --env CGO_ENABLED=0 task-manager:latest go test ./... 
 ```
+
+## Docs
+### Create user (role id's, if setup, 1 = manager, 2 = technician)
+```shell
+$ curl -X POST \
+  http://localhost:8080/users/register \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"email": "manager@test.com",
+	"name": "manager",
+	"password": "<pwd>",
+	"roles": [1]
+}'
+```
+
+### Login user
+```shell
+$ curl -X POST \
+  http://localhost:8080/users/login \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"email": "technician@test.com",
+	"password": "<pwd>"
+}'
+```
+
+### Create Task
+```shell
+$ curl -X POST \
+  http://localhost:8080/tasks \
+  -H 'Authorization: Bearer <jwt>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"summary": "new task"
+}'
+```
+
+### List all Tasks
+```shell
+$ curl -X GET \
+  http://localhost:8080/tasks \
+  -H 'Authorization: Bearer <jwt>'
+```
+
+### List technician Tasks
+```shell
+$ curl -X GET \
+  http://localhost:8080/tasks/technician \
+  -H 'Authorization: Bearer <jwt>'
+```
