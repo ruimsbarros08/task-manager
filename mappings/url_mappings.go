@@ -8,6 +8,7 @@ import (
 type Mappings struct {
 	UserController controllers.UsersController
 	TaskController controllers.TasksController
+	Middleware     Middleware
 }
 
 func (m *Mappings)CreateUrlMappings() *gin.Engine {
@@ -21,8 +22,10 @@ func (m *Mappings)CreateUrlMappings() *gin.Engine {
 
 	tasks := router.Group("/tasks")
 	{
-		tasks.POST("/", m.TaskController.CreateTask)
-		tasks.GET("/", m.TaskController.ListTasks)
+		tasks.Use(m.Middleware.AuthMiddleware)
+		tasks.POST("/", m.Middleware.IsTechnicianMiddleware, m.TaskController.CreateTask)
+		tasks.GET("/", m.Middleware.IsManagerMiddleWare, m.TaskController.ListTasks)
+		tasks.GET("/technician", m.Middleware.IsTechnicianMiddleware, m.TaskController.ListTechnicianTasks)
 	}
 
 	return router

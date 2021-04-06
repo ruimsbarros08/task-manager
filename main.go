@@ -30,6 +30,7 @@ func inject() *gin.Engine {
 	userController := controllers.UsersController{UserService: userService, AuthService: authService}
 	taskController := controllers.TasksController{UserService: userService, AuthService: authService, TaskService: taskService, TaskHandler: taskHandler}
 
-	m := mappings.Mappings{TaskController: taskController, UserController: userController}
+	middleware := mappings.Middleware{AuthService: authService, UserService: userService}
+	m := mappings.Mappings{TaskController: taskController, UserController: userController, Middleware: middleware}
 	return m.CreateUrlMappings()
 }

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ruimsbarros08/task-manager/models"
 	"github.com/ruimsbarros08/task-manager/services"
 	"net/http"
 )
@@ -24,26 +25,12 @@ func (ctr *TasksController) CreateTask(c *gin.Context) {
 		return
 	}
 
-	bearToken := c.Request.Header.Get("Authorization")
-	token := ctr.AuthService.ExtractTokenFromHeader(bearToken)
-
-	userId, err := ctr.AuthService.ExtractTokenMetadata(token)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	u, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user is missing"})
 		return
 	}
-
-	user, err := ctr.UserService.GetUserById(uint(userId))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User does not exist"})
-		return
-	}
-
-	role, err := ctr.UserService.UserHasRole(user, "Technician")
-	if !role {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User is not technician"})
-		return
-	}
+	user := u.(models.User)
 
 	task, err := ctr.TaskService.CreateTask(input.Summary, user)
 	if err != nil {
@@ -62,48 +49,32 @@ func (ctr *TasksController) UpdateTask(c *gin.Context) {
 
 func (ctr *TasksController) ListTasks(c *gin.Context) {
 	//TODO pagination
-	bearToken := c.Request.Header.Get("Authorization")
-	token := ctr.AuthService.ExtractTokenFromHeader(bearToken)
+	tasks, err := ctr.TaskService.GetAllTasks()
 
-	userId, err := ctr.AuthService.ExtractTokenMetadata(token)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := ctr.UserService.GetUserById(uint(userId))
+	c.JSON(http.StatusOK, gin.H{"data": tasks})
+}
+
+func (ctr *TasksController) ListTechnicianTasks(c *gin.Context) {
+	//TODO pagination
+	u, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user is missing"})
+		return
+	}
+	user := u.(models.User)
+	tasks, err := ctr.TaskService.GetTechnicianTasks(user.ID)
+
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User does not exist"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	role, err := ctr.UserService.UserHasRole(user, "Manager")
-	if role {
-		tasks, err := ctr.TaskService.GetAllTasks()
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"data": tasks})
-		return
-	}
-
-	role, err = ctr.UserService.UserHasRole(user, "Technician")
-	if role {
-		tasks, err := ctr.TaskService.GetTechnicianTasks(user.ID)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"data": tasks})
-		return
-	}
-
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "User has no permission"})
+	c.JSON(http.StatusOK, gin.H{"data": tasks})
 }
 
 func (ctr *TasksController) DeleteTask(c *gin.Context) {
