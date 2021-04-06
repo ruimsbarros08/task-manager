@@ -22,13 +22,14 @@ func inject() *gin.Engine {
 	q := redisService.OpenQueue("tasks")
 
 	userRepository := repositories.UserRepository{Db: db}
+	tasksRepository := repositories.TasksRepository{Db: db}
 	encryptionService := services.EncryptionService{}
 	userService := services.UserService{UsersRepository: userRepository, Db: db, EncryptionService: encryptionService}
-	taskService := services.TaskService{Db: db}
+	taskService := services.TaskService{TasksRepository: &tasksRepository}
 	authService := services.AuthenticationService{UserService: userService, EncryptionService: encryptionService}
 	taskHandler := services.TaskHandler{Q: q}
 	userController := controllers.UsersController{UserService: userService, AuthService: authService}
-	taskController := controllers.TasksController{UserService: userService, AuthService: authService, TaskService: taskService, TaskHandler: taskHandler}
+	taskController := controllers.TasksController{TaskService: &taskService, TaskHandler: &taskHandler}
 
 	middleware := mappings.Middleware{AuthService: authService, UserService: userService}
 	m := mappings.Mappings{TaskController: taskController, UserController: userController, Middleware: middleware}

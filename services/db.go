@@ -8,7 +8,6 @@ import (
 )
 
 type Database struct {
-	DB *gorm.DB
 }
 
 func (d *Database) ConnectDatabase() *gorm.DB {
@@ -19,16 +18,16 @@ func (d *Database) ConnectDatabase() *gorm.DB {
 	return database
 }
 
-func (d *Database) Migrate() {
-	d.DB.AutoMigrate(&models.Role{})
-	d.DB.AutoMigrate(&models.User{})
-	d.DB.AutoMigrate(&models.Task{})
+func (d *Database) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&models.Role{})
+	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Task{})
 }
 
-func (d *Database) Seed() {
+func (d *Database) Seed(db *gorm.DB) {
 	managerRole := models.Role{Name: "Manager"}
 	technicianRole := models.Role{Name: "Technician"}
 
-	d.DB.Create(&managerRole)
-	d.DB.Create(&technicianRole)
+	db.Create(&managerRole)
+	db.Create(&technicianRole)
 }

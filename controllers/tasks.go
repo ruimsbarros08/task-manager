@@ -8,10 +8,8 @@ import (
 )
 
 type TasksController struct {
-	TaskService services.TaskService
-	AuthService services.AuthenticationService
-	UserService services.UserService
-	TaskHandler services.TaskHandler
+	TaskService services.TaskServiceInterface
+	TaskHandler services.TaskHandlerInterface
 }
 
 type TaskInput struct {
@@ -44,7 +42,6 @@ func (ctr *TasksController) CreateTask(c *gin.Context) {
 
 func (ctr *TasksController) UpdateTask(c *gin.Context) {
 	//TODO
-
 }
 
 func (ctr *TasksController) ListTasks(c *gin.Context) {
